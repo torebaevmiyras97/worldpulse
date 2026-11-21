@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="uz">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="WorldPulse — dunyo yangiliklari bir joyda.">
+  <title>WorldPulse — The World. One Pulse.</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/">WORLD<span>PULSE</span></a>
+  <nav><a href="#latest" data-i="latest">So‘nggi</a><a href="#popular" data-i="popular">Ommabop</a><a href="#topics" data-i="topics">Mavzular</a></nav>
+  <select id="lang" aria-label="Language"><option value="uz">UZ</option><option value="ru">RU</option><option value="en">EN</option></select>
+</header>
+<main>
+  <section class="hero">
+    <div><p class="eyebrow" data-i="eyebrow">DUNYO YANGILIKLARI · BIR JOYDA</p>
+      <h1 data-i="headline">Dunyo ritmini<br><em>birinchi bo‘lib</em> his eting.</h1>
+      <p class="sub" data-i="sub">Jahon, texnologiya, biznes, sport va ilm-fandagi muhim voqealar.</p>
+      <a class="cta" href="#latest" data-i="explore">Yangiliklarni ko‘rish ↓</a>
+    </div>
+    <div class="globe"><div class="orbit o1"></div><div class="orbit o2"></div><div class="planet">🌐</div><span class="live">● LIVE WORLD FEED</span></div>
+  </section>
+  <div class="ad-slot"><small>ADVERTISEMENT / REKLAMA</small><b data-i="ad">Reklama joyi — reklama tarmog‘i ulangach faollashadi</b></div>
+  <section id="topics" class="section">
+    <div class="section-head"><div><p class="eyebrow">EXPLORE</p><h2 data-i="topics">Mavzular</h2></div></div>
+    <div class="chips" id="filters">
+      <button class="chip active" data-cat="all" data-i="all">Barchasi</button>
+      <button class="chip" data-cat="world" data-i="world">Jahon</button>
+      <button class="chip" data-cat="technology" data-i="technology">Texnologiya</button>
+      <button class="chip" data-cat="business" data-i="business">Biznes</button>
+      <button class="chip" data-cat="sports" data-i="sports">Sport</button>
+      <button class="chip" data-cat="science" data-i="science">Ilm-fan</button>
+    </div>
+  </section>
+  <section id="latest" class="section">
+    <div class="section-head"><div><p class="eyebrow">WORLD DESK</p><h2 data-i="latest">So‘nggi yangiliklar</h2></div>
+      <input id="search" placeholder="Yangilik qidirish…" aria-label="Search">
+    </div>
+    <div id="news" class="news-grid"><article class="news-card featured"><div class="card-art art1">🌍</div><div class="card-body"><span class="tag">WORLD PULSE</span><h3>WorldPulse ishga tushishga tayyorlanmoqda</h3><p>Bu joy serverga haqiqiy RSS yangiliklari ulangach avtomatik to‘ldiriladi.</p><small>DEMO · HAQIQIY YANGILIK EMAS</small></div></article></div>
+  </section>
+  <div class="ad-slot horizontal"><small>ADVERTISEMENT / REKLAMA</small><b data-i="ad">Reklama joyi — reklama tarmog‘i ulangach faollashadi</b></div>
+  <section id="popular" class="newsletter"><div><p class="eyebrow">STAY INFORMED</p><h2 data-i="follow">Dunyodan xabardor bo‘ling.</h2><p data-i="followSub">Muhim voqealar — bitta manzilda.</p></div><div class="status" id="status">Server holati tekshirilmoqda…</div></section>
+</main>
+<footer><a class="brand" href="/">WORLD<span>PULSE</span></a><p>© 2026 WorldPulse · <span data-i="tagline">The World. One Pulse.</span></p><small data-i="disclaimer">Maqolalar manbasi har bir xabarda ko‘rsatiladi.</small></footer>
+<script src="/static/app.js"></script>
+</body></html>
