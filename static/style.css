@@ -799,3 +799,90 @@ footer .brand {
     font-size: 25px;
   }
 }
+
+/* =====================================
+   WORLDPULSE — GLOBAL ATMOSPHERE
+   ===================================== */
+
+body {
+  background:
+    radial-gradient(ellipse at 12% 15%, rgba(24, 91, 160, .20), transparent 38%),
+    radial-gradient(ellipse at 88% 35%, rgba(91, 48, 160, .15), transparent 36%),
+    radial-gradient(ellipse at 50% 90%, rgba(18, 75, 125, .16), transparent 42%),
+    #050d17;
+  background-attachment: fixed;
+  position: relative;
+  isolation: isolate;
+}
+
+/* Mayin yorug‘lik qatlamlari */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(35, 126, 214, .13), transparent 24%),
+    radial-gradient(circle at 78% 65%, rgba(125, 74, 204, .12), transparent 25%);
+  animation: worldpulse-glow 16s ease-in-out infinite alternate;
+}
+
+/* Dunyo xaritasini eslatuvchi nozik nuqtalar */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .20;
+  background-image:
+    radial-gradient(circle, rgba(120, 180, 235, .55) 1px, transparent 1.5px);
+  background-size: 27px 27px;
+  mask-image: radial-gradient(ellipse at center, black 5%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 5%, transparent 78%);
+}
+
+/* Kartochkalarga shaffoflik */
+.news-card,
+.side-news,
+.hero-main {
+  background-color: rgba(11, 23, 37, .88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.news-card,
+.side-news {
+  box-shadow: 0 10px 35px rgba(0, 0, 0, .16);
+}
+
+/* Menyu ham fon bilan uyg‘unlashadi */
+.top {
+  background: rgba(5, 13, 23, .88);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+/* Yorug‘lik harakati */
+@keyframes worldpulse-glow {
+  0% {
+    transform: scale(1);
+    opacity: .65;
+  }
+  100% {
+    transform: scale(1.12);
+    opacity: 1;
+  }
+}
+
+/* Harakatni kamaytirishni tanlagan foydalanuvchilar uchun */
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
+}
