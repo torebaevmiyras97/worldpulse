@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from pathlib import Path
 from html.parser import HTMLParser
 from html import unescape
@@ -17,9 +17,11 @@ from .feeds import RSS_FEEDS
 BASE = Path(__file__).resolve().parent.parent
 DB = BASE / "worldpulse.db"
 
+SITE_URL = "https://worldpulse-ousr.onrender.com"
+
 ENABLE_RSS_BOT = os.getenv("ENABLE_RSS_BOT", "false").lower() == "true"
 
-app = FastAPI(title="WorldPulse API", version="0.2.0")
+app = FastAPI(title="WorldPulse API", version="0.3.0")
 scheduler = BackgroundScheduler()
 
 
@@ -37,10 +39,13 @@ class ImageFinder(HTMLParser):
 def valid_image_url(url):
     if not url:
         return ""
+
     url = str(url).strip()
     parsed = urlparse(url)
+
     if parsed.scheme in ("http", "https") and parsed.netloc:
         return url
+
     return ""
 
 
@@ -105,11 +110,15 @@ def init_db():
 
         columns = [
             row["name"]
-            for row in con.execute("PRAGMA table_info(articles)").fetchall()
+            for row in con.execute(
+                "PRAGMA table_info(articles)"
+            ).fetchall()
         ]
 
         if "image_url" not in columns:
-            con.execute("ALTER TABLE articles ADD COLUMN image_url TEXT")
+            con.execute(
+                "ALTER TABLE articles ADD COLUMN image_url TEXT"
+            )
 
 
 def fetch_feeds():
@@ -122,7 +131,9 @@ def fetch_feeds():
 
             for entry in parsed.entries[:20]:
                 url = str(entry.get("link", "")).strip()
-                title = clean_text(entry.get("title", ""), 300)
+                title = clean_text(
+                    entry.get("title", ""), 300
+                )
 
                 if not url or not title:
                     continue
@@ -163,7 +174,9 @@ def fetch_feeds():
                 f"RSS xatosi ({feed_info['name']}): {exc}"
             )
 
-    print(f"WorldPulse: {added} yangi maqola qo'shildi")
+    print(
+        f"WorldPulse: {added} yangi maqola qo'shildi"
+    )
 
 
 @app.on_event("startup")
@@ -172,6 +185,7 @@ def startup():
 
     if ENABLE_RSS_BOT:
         fetch_feeds()
+
         scheduler.add_job(
             fetch_feeds,
             "interval",
@@ -179,6 +193,7 @@ def startup():
             id="rss_fetch",
             replace_existing=True
         )
+
         scheduler.start()
 
 
@@ -196,8 +211,13 @@ def articles(q: str = "", category: str = "all"):
         clauses = []
 
         if q:
-            clauses.append("(title LIKE ? OR summary LIKE ?)")
-            args.extend([f"%{q}%", f"%{q}%"])
+            clauses.append(
+                "(title LIKE ? OR summary LIKE ?)"
+            )
+            args.extend([
+                f"%{q}%",
+                f"%{q}%"
+            ])
 
         if category != "all":
             clauses.append("category = ?")
@@ -207,6 +227,7 @@ def articles(q: str = "", category: str = "all"):
             sql += " WHERE " + " AND ".join(clauses)
 
         sql += " ORDER BY rowid DESC LIMIT 100"
+
         rows = con.execute(sql, args).fetchall()
 
     return [dict(row) for row in rows]
@@ -227,9 +248,41 @@ def status():
     }
 
 
+@app.get("/robots.txt")
+def robots():
+    content = f"""User-agent: *
+Allow: /
+
+Sitemap: {SITE_URL}/sitemap.xml
+"""
+
+    return Response(
+        content=content,
+        media_type="text/plain"
+    )
+
+
+@app.get("/sitemap.xml")
+def sitemap():
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>{SITE_URL}/</loc>
+    </url>
+</urlset>
+"""
+
+    return Response(
+        content=xml,
+        media_type="application/xml"
+    )
+
+
 @app.get("/")
 def home():
-    return FileResponse(BASE / "static" / "index.html")
+    return FileResponse(
+        BASE / "static" / "index.html"
+    )
 
 
 app.mount(
