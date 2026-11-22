@@ -886,3 +886,19 @@ body::after {
     scroll-behavior: auto;
   }
 }
+
+/* WORLDPULSE — REAL WORLD MAP BACKGROUND */
+
+body {
+  background-image:
+    linear-gradient(
+      rgba(5, 13, 23, 0.62),
+      rgba(5, 13, 23, 0.76)
+    ),
+    url("/static/world-map-bg.jpg");
+
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
