@@ -3,11 +3,6 @@ const translations = {
     latest: "So‘nggi yangiliklar",
     popular: "Ommabop",
     topics: "Mavzular",
-    eyebrow: "DUNYO YANGILIKLARI · BIR JOYDA",
-    headline: "Dunyo ritmini birinchi bo‘lib his eting.",
-    sub: "Jahon, texnologiya, biznes, sport va ilm-fandagi muhim voqealar.",
-    explore: "Yangiliklarni ko‘rish ↓",
-    ad: "Reklama joyi — reklama tarmog‘i ulangach faollashadi",
     all: "Barchasi",
     world: "Jahon",
     technology: "Texnologiya",
@@ -16,23 +11,20 @@ const translations = {
     science: "Ilm-fan",
     follow: "Dunyodan xabardor bo‘ling.",
     followSub: "Muhim voqealar — bitta manzilda.",
-    tagline: "The World. One Pulse.",
-    disclaimer: "Maqolalar manbasi har bir xabarda ko‘rsatiladi.",
     search: "Yangilik qidirish…",
     loading: "Yangiliklar yuklanmoqda…",
     empty: "Hozircha yangilik topilmadi.",
     error: "Yangiliklarni yuklashda xatolik yuz berdi.",
-    read: "Asl manba ↗"
+    read: "Asl manba ↗",
+    expand: "To‘liq o‘qish ↓",
+    collapse: "Yig‘ish ↑",
+    featured: "⚡ Asosiy yangilik",
+    noImage: "📰"
   },
   ru: {
     latest: "Последние новости",
     popular: "Популярное",
     topics: "Темы",
-    eyebrow: "МИРОВЫЕ НОВОСТИ · В ОДНОМ МЕСТЕ",
-    headline: "Почувствуйте ритм мира первыми.",
-    sub: "Главные события мира, технологий, бизнеса, спорта и науки.",
-    explore: "Смотреть новости ↓",
-    ad: "Место для рекламы — активируется после подключения рекламной сети",
     all: "Все",
     world: "Мир",
     technology: "Технологии",
@@ -41,23 +33,20 @@ const translations = {
     science: "Наука",
     follow: "Будьте в курсе событий.",
     followSub: "Важные события — в одном месте.",
-    tagline: "The World. One Pulse.",
-    disclaimer: "Источник каждой статьи указан в публикации.",
     search: "Поиск новостей…",
     loading: "Загрузка новостей…",
     empty: "Новостей пока нет.",
     error: "Ошибка загрузки новостей.",
-    read: "Первоисточник ↗"
+    read: "Первоисточник ↗",
+    expand: "Читать полностью ↓",
+    collapse: "Свернуть ↑",
+    featured: "⚡ Главная новость",
+    noImage: "📰"
   },
   en: {
     latest: "Latest news",
     popular: "Popular",
     topics: "Topics",
-    eyebrow: "WORLD NEWS · ONE PLACE",
-    headline: "Feel the pulse of the world first.",
-    sub: "Important stories from world affairs, technology, business, sports and science.",
-    explore: "Explore news ↓",
-    ad: "Advertisement space — activates when an ad network is connected",
     all: "All",
     world: "World",
     technology: "Technology",
@@ -66,13 +55,15 @@ const translations = {
     science: "Science",
     follow: "Stay informed.",
     followSub: "Important events — all in one place.",
-    tagline: "The World. One Pulse.",
-    disclaimer: "The source of each article is displayed.",
     search: "Search news…",
     loading: "Loading news…",
     empty: "No news found.",
     error: "There was an error loading news.",
-    read: "Original source ↗"
+    read: "Original source ↗",
+    expand: "Read more ↓",
+    collapse: "Show less ↑",
+    featured: "⚡ Featured story",
+    noImage: "📰"
   }
 };
 
@@ -114,39 +105,94 @@ function setLanguage(value) {
     }
   });
 
-  $("#search").placeholder = translations[lang].search;
+  const search = $("#search");
+  if (search) search.placeholder = translations[lang].search;
+
   loadNews();
 }
 
 function formatCategory(value) {
   const key = String(value || "world").toLowerCase();
-  return translations[lang][key] || key.toUpperCase();
+  return translations[lang][key] || value || translations[lang].world;
+}
+
+function makeImage(url, alt, className) {
+  const box = document.createElement("div");
+  box.className = className;
+
+  const imageUrl = safeUrl(url);
+
+  if (imageUrl) {
+    const img = document.createElement("img");
+    img.src = imageUrl;
+    img.alt = alt || "WorldPulse news";
+    img.loading = "lazy";
+
+    img.onerror = () => {
+      img.remove();
+      box.textContent = translations[lang].noImage;
+    };
+
+    box.appendChild(img);
+  } else {
+    box.textContent = translations[lang].noImage;
+  }
+
+  return box;
+}
+
+function makeReadMore(summary) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "summary-wrap";
+
+  const text = document.createElement("p");
+  text.className = "news-summary";
+  text.textContent = summary || "";
+
+  wrapper.appendChild(text);
+
+  if ((summary || "").length > 130) {
+    const button = document.createElement("button");
+    button.className = "expand-button";
+    button.type = "button";
+    button.textContent = translations[lang].expand;
+
+    button.addEventListener("click", () => {
+      const expanded = wrapper.classList.toggle("expanded");
+      button.textContent = expanded
+        ? translations[lang].collapse
+        : translations[lang].expand;
+    });
+
+    wrapper.appendChild(button);
+  }
+
+  return wrapper;
+}
+
+function makeSourceLink(article) {
+  const url = safeUrl(article.url);
+  if (!url) return null;
+
+  const link = document.createElement("a");
+  link.className = "source-link";
+  link.href = url;
+  link.target = "_blank";
+  link.rel = "noopener noreferrer";
+  link.textContent = translations[lang].read;
+
+  return link;
 }
 
 function createNewsCard(article) {
   const card = document.createElement("article");
   card.className = "news-card";
 
-  const imageBox = document.createElement("div");
-  imageBox.className = "card-art";
-
-  const imageUrl = safeUrl(article.image_url);
-
-  if (imageUrl) {
-    const img = document.createElement("img");
-    img.src = imageUrl;
-    img.alt = article.title || "WorldPulse news";
-    img.loading = "lazy";
-
-    img.onerror = () => {
-      img.remove();
-      imageBox.textContent = "📰";
-    };
-
-    imageBox.appendChild(img);
-  } else {
-    imageBox.textContent = "📰";
-  }
+  const image = makeImage(
+    article.image_url,
+    article.title,
+    "card-art"
+  );
 
   const body = document.createElement("div");
   body.className = "card-body";
@@ -158,27 +204,121 @@ function createNewsCard(article) {
   const title = document.createElement("h3");
   title.textContent = article.title || "";
 
-  const summary = document.createElement("p");
-  summary.textContent = article.summary || "";
+  const summary = makeReadMore(article.summary || "");
 
-  const footer = document.createElement("small");
-  footer.textContent = article.source || "WorldPulse";
+  const footer = document.createElement("div");
+  footer.className = "card-footer";
 
-  const url = safeUrl(article.url);
+  const source = document.createElement("span");
+  source.className = "news-source";
+  source.textContent = article.source || "WorldPulse";
 
-  if (url) {
-    const link = document.createElement("a");
-    link.href = url;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    link.textContent = " · " + translations[lang].read;
-    footer.appendChild(link);
-  }
+  footer.appendChild(source);
+
+  const link = makeSourceLink(article);
+  if (link) footer.appendChild(link);
 
   body.append(tag, title, summary, footer);
-  card.append(imageBox, body);
+  card.append(image, body);
 
   return card;
+}
+
+function createHero(article) {
+  const container = $("#hero-main");
+  if (!container) return;
+
+  container.replaceChildren();
+
+  const image = makeImage(
+    article.image_url,
+    article.title,
+    "hero-image"
+  );
+
+  const overlay = document.createElement("div");
+  overlay.className = "hero-content";
+
+  const badge = document.createElement("span");
+  badge.className = "hero-badge";
+  badge.textContent = translations[lang].featured;
+
+  const title = document.createElement("h1");
+  title.textContent = article.title || "";
+
+  const summary = document.createElement("p");
+  summary.className = "hero-summary";
+  summary.textContent = article.summary || "";
+
+  const meta = document.createElement("div");
+  meta.className = "hero-meta";
+
+  const tag = document.createElement("span");
+  tag.textContent = formatCategory(article.category);
+
+  const source = document.createElement("span");
+  source.textContent = article.source || "WorldPulse";
+
+  meta.append(tag, source);
+
+  const link = makeSourceLink(article);
+  if (link) meta.appendChild(link);
+
+  overlay.append(badge, title, summary, meta);
+  container.append(image, overlay);
+}
+
+function createSideNews(article) {
+  const card = document.createElement("article");
+  card.className = "side-news";
+
+  const image = makeImage(
+    article.image_url,
+    article.title,
+    "side-image"
+  );
+
+  const body = document.createElement("div");
+  body.className = "side-body";
+
+  const categoryTag = document.createElement("span");
+  categoryTag.className = "side-category";
+  categoryTag.textContent = formatCategory(article.category);
+
+  const title = document.createElement("h3");
+  title.textContent = article.title || "";
+
+  const source = document.createElement("small");
+  source.textContent = article.source || "WorldPulse";
+
+  const link = makeSourceLink(article);
+
+  body.append(categoryTag, title, source);
+  if (link) body.appendChild(link);
+
+  card.append(image, body);
+  return card;
+}
+
+function renderFeatured(articles) {
+  const main = $("#hero-main");
+  const side = $("#hero-side");
+
+  if (!main || !side) return;
+
+  main.replaceChildren();
+  side.replaceChildren();
+
+  if (!articles.length) {
+    main.textContent = translations[lang].empty;
+    return;
+  }
+
+  createHero(articles[0]);
+
+  articles.slice(1, 4).forEach(article => {
+    side.appendChild(createSideNews(article));
+  });
 }
 
 async function loadNews() {
@@ -200,19 +340,38 @@ async function loadNews() {
     }
 
     const articles = await response.json();
+
+    if (!Array.isArray(articles)) {
+      throw new Error("Invalid news data");
+    }
+
+    renderFeatured(articles);
+
     container.replaceChildren();
 
-    if (!articles.length) {
-      container.textContent = translations[lang].empty;
+    // Asosiy va yon yangiliklardan keyingilarini chiqaramiz.
+    const latestArticles = articles.slice(4);
+
+    if (!latestArticles.length) {
+      container.textContent = articles.length
+        ? ""
+        : translations[lang].empty;
       return;
     }
 
-    articles.forEach(article => {
+    latestArticles.forEach(article => {
       container.appendChild(createNewsCard(article));
     });
+
   } catch (error) {
     console.error("WorldPulse:", error);
+
     container.textContent = translations[lang].error;
+
+    const main = $("#hero-main");
+    if (main) {
+      main.textContent = translations[lang].error;
+    }
   }
 }
 
@@ -229,8 +388,10 @@ async function checkStatus() {
     statusElement.textContent =
       "WorldPulse: " + data.status +
       " · " + data.articles + " news";
+
   } catch {
-    statusElement.textContent = "WorldPulse server status unavailable.";
+    statusElement.textContent =
+      "WorldPulse server status unavailable.";
   }
 }
 
